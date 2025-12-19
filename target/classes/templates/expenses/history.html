@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--
+    ============================================================
+    HISTORY PAGE - Expense Sharing Application
+    ============================================================
+    Pure HTML5 + CSS3 implementation (No JavaScript)
+    
+    FEATURES:
+    - CSS-only tabs using :checked pseudo-class
+    - Delete confirmation using :focus-within and :target
+    - Clear Entire History modal using :target selector
+    - Responsive grid layout with Flexbox/CSS Grid
+    - Hover effects and smooth transitions
+    - Empty state UI
+    - High accessibility with focus states
+    
+    DELETE UX DECISIONS:
+    - Individual delete buttons show confirmation on hover/focus
+    - "Clear Entire History" opens a modal overlay for safety
+    - Red/danger colors used sparingly to indicate destructive actions
+    - Confirmation required before any delete action
+    ============================================================
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View and manage your expense and settlement history">
+    <title>Activity History - ExpenseShare</title>
+
+    <!-- Bootstrap CSS (required for shared navbar) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* ============================================================
+           CSS CUSTOM PROPERTIES (Variables) - History Page
+           NOTE: Navbar uses shared header fragment, no custom navbar styles here
+           ============================================================ */
+        :root {
+            /* Color Palette */
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --primary-light: #a3bffa;
+            --secondary: #764ba2;
+            --success: #38a169;
+            --success-light: #c6f6d5;
+            --danger: #e53e3e;
+            --danger-light: #fed7d7;
+            --danger-dark: #c53030;
+            --warning: #dd6b20;
+            --gray-50: #f7fafc;
+            --gray-100: #edf2f7;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e0;
+            --gray-400: #a0aec0;
+            --gray-500: #718096;
+            --gray-600: #4a5568;
+            --gray-700: #2d3748;
+            --gray-800: #1a202c;
+            --white: #ffffff;
+
+            /* Typography */
+            --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 2rem;
+
+            /* Spacing Scale */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Border Radius */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-full: 50px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --shadow-danger: 0 4px 12px rgba(229, 62, 62, 0.3);
+
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        /* History page specific body styles (no CSS reset to avoid conflicts) */
+        .history-page-content {
+            font-family: var(--font-family);
+            background-color: var(--gray-50);
+            min-height: 100vh;
+        }
+
+        .history-page-content a {
+            text-decoration: none;
+        }
+
+        /* ============================================================
+           MAIN LAYOUT
+           ============================================================ */
+        .main-content {
+            margin-top: 64px;
+            padding: var(--space-xl);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ============================================================
+           PAGE HEADER with "Clear Entire History" Button
+           ============================================================ */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            margin: calc(-1 * var(--space-xl));
+            margin-bottom: var(--space-xl);
+            padding: var(--space-2xl) var(--space-xl);
+            color: var(--white);
+        }
+
+        .page-header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+        }
+
+        .page-header-content {
+            flex: 1;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: var(--space-sm);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb-item {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--white);
+        }
+
+        .breadcrumb-separator {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .page-title {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: var(--font-size-md);
+        }
+
+        /* Clear Entire History Button - Danger Action */
+        .clear-history-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-lg);
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-sm);
+            color: var(--white);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            position: relative;
+        }
+
+        .clear-history-btn:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            box-shadow: var(--shadow-danger);
+        }
+
+        .clear-history-btn:focus {
+            outline: 2px solid var(--white);
+            outline-offset: 2px;
+        }
+
+        /* Tooltip for Clear Button */
+        .clear-history-btn::after {
+            content: 'Deletes all history records';
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-800);
+            color: var(--white);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 400;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-fast);
+        }
+
+        .clear-history-btn:hover::after,
+        .clear-history-btn:focus::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ============================================================
+           CSS-ONLY MODAL for "Clear Entire History" Confirmation
+           Using :target pseudo-class
+           ============================================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-normal);
+        }
+
+        .modal-overlay:target {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: var(--transition-normal);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-overlay:target .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--danger-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto var(--space-lg);
+        }
+
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: var(--space-sm);
+        }
+
+        .modal-message {
+            color: var(--gray-600);
+            margin-bottom: var(--space-xl);
+            line-height: 1.6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: none;
+        }
+
+        .modal-btn-cancel {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .modal-btn-cancel:hover {
+            background: var(--gray-300);
+        }
+
+        .modal-btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .modal-btn-danger:hover {
+            background: var(--danger-dark);
+        }
+
+        .modal-btn:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* ============================================================
+           CSS-ONLY TABS using :checked pseudo-class
+           ============================================================ */
+        .tabs-container {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-xl);
+            overflow: hidden;
+        }
+
+        /* Hide radio inputs visually but keep accessible */
+        .tab-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .tab-label {
+            flex: 1;
+            padding: var(--space-md) var(--space-lg);
+            text-align: center;
+            font-weight: 600;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -1px;
+        }
+
+        .tab-label:hover {
+            color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        /* Active Tab Indicator */
+        #tab-all:checked~.tabs-header .tab-label[for="tab-all"],
+        #tab-expenses:checked~.tabs-header .tab-label[for="tab-expenses"],
+        #tab-settlements:checked~.tabs-header .tab-label[for="tab-settlements"] {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: var(--white);
+        }
+
+        /* Tab Content Visibility */
+        .tab-content {
+            display: none;
+            padding: var(--space-lg);
+        }
+
+        #tab-all:checked~.tab-content.content-all,
+        #tab-expenses:checked~.tab-content.content-expenses,
+        #tab-settlements:checked~.tab-content.content-settlements {
+            display: block;
+        }
+
+        /* ============================================================
+           DATE GROUP HEADERS
+           ============================================================ */
+        .date-group {
+            margin-bottom: var(--space-xl);
+        }
+
+        .date-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            color: var(--gray-500);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .date-header::before,
+        .date-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        /* ============================================================
+           ACTIVITY CARDS with Delete Functionality
+           ============================================================ */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .activity-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            overflow: visible;
+            transition: var(--transition-normal);
+            border: 1px solid var(--gray-100);
+            position: relative;
+        }
+
+        .activity-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        /* Left border indicator for activity type */
+        .activity-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .activity-card.expense::before {
+            background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .activity-card.settlement::before {
+            background: linear-gradient(180deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .activity-card-inner {
+            display: flex;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            padding-left: calc(var(--space-lg) + 4px);
+        }
+
+        /* Activity Icon */
+        .activity-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.expense {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .activity-icon.settlement {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        /* Activity Content */
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-title {
+            font-size: var(--font-size-md);
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: var(--space-xs);
+        }
+
+        .activity-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            align-items: center;
+            margin-bottom: var(--space-sm);
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-split {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .badge-you-owe {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge-you-get {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .badge-settled {
+            background: var(--gray-100);
+            color: var(--gray-500);
+        }
+
+        .activity-details {
+            font-size: var(--font-size-sm);
+            color: var(--gray-500);
+        }
+
+        .activity-details strong {
+            color: var(--gray-700);
+        }
+
+        /* Inactive/Former User Indicator - Preserves user identity in history */
+        .user-inactive {
+            font-size: var(--font-size-xs);
+            color: var(--gray-400);
+            font-weight: 400;
+            font-style: italic;
+            margin-left: 4px;
+        }
+
+        /* Activity Amount */
+        .activity-amount {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .amount-value {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+        }
+
+        .amount-value.negative {
+            color: var(--danger);
+        }
+
+        .amount-value.positive {
+            color: var(--success);
+        }
+
+        .amount-date {
+            font-size: var(--font-size-xs);
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        /* Settlement Flow Display */
+        .settlement-flow {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--gray-600);
+        }
+
+        .settlement-arrow {
+            color: var(--gray-400);
+        }
+
+        /* ============================================================
+           DELETE BUTTON with CSS-Only Confirmation
+           
+           UX DECISION:
+           - Delete icon is subtle (gray) to not distract
+           - On hover/focus, shows confirmation overlay
+           - Uses :focus-within to keep confirmation open
+           - Red color only appears on confirm button
+           ============================================================ */
+        .delete-wrapper {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        /* Show delete icon on card hover or focus-within */
+        .activity-card:hover .delete-wrapper,
+        .activity-card:focus-within .delete-wrapper {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .delete-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--gray-200);
+            color: var(--gray-400);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .delete-btn:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+            border-color: var(--danger);
+            transform: scale(1.05);
+        }
+
+        .delete-btn:focus {
+            outline: 2px solid var(--danger);
+            outline-offset: 2px;
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        /* Tooltip on hover */
+        .delete-btn::after {
+            content: 'Delete entry';
+            position: absolute;
+            bottom: calc(100% + 6px);
+            right: 0;
+            background: var(--gray-800);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.15s ease;
+        }
+
+        .delete-btn:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Delete Confirmation Popup - Modern inline confirmation replacing browser alerts */
+        .delete-confirm {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+            border: 1px solid var(--danger-light);
+            border-left: 3px solid var(--danger);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            box-shadow: 0 8px 24px rgba(229, 62, 62, 0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px) scale(0.95);
+            transition: all 0.2s ease;
+            z-index: 30;
+        }
+
+        /* Show confirmation on delete button hover/focus */
+        .delete-wrapper:hover .delete-confirm,
+        .delete-wrapper:focus-within .delete-confirm {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .delete-confirm-text {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--danger);
+            margin-bottom: var(--space-sm);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .delete-confirm-text::before {
+            content: '⚠️';
+            font-size: 1rem;
+        }
+
+        .delete-confirm-actions {
+            display: flex;
+            gap: var(--space-sm);
+            justify-content: center;
+        }
+
+        .confirm-btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+            min-width: 60px;
+        }
+
+        .confirm-yes {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .confirm-yes:hover {
+            background: var(--danger-dark);
+            transform: scale(1.02);
+        }
+
+        .confirm-yes:focus {
+            outline: 2px solid var(--danger);
+            outline-offset: 2px;
+        }
+
+        .confirm-no {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .confirm-no:hover {
+            background: var(--gray-300);
+        }
+
+        .confirm-no:focus {
+            outline: 2px solid var(--gray-500);
+            outline-offset: 2px;
+        }
+
+        /* ============================================================
+           EMPTY STATE
+           ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-2xl);
+        }
+
+        .empty-state-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--gray-400);
+            margin: 0 auto var(--space-lg);
+        }
+
+        .empty-state-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: var(--space-sm);
+        }
+
+        .empty-state-text {
+            color: var(--gray-500);
+            max-width: 400px;
+            margin: 0 auto var(--space-lg);
+            line-height: 1.6;
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .page-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: var(--space-xl);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin: 0 auto var(--space-sm);
+        }
+
+        .stat-icon.expense {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .stat-icon.settlement {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .stat-value {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--gray-500);
+        }
+
+        /* Action Cards */
+        .action-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-card-title {
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--gray-700);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--gray-300);
+            color: var(--gray-600);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Info Card */
+        .info-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+        }
+
+        .info-card-title {
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .info-card-text {
+            font-size: var(--font-size-sm);
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        /* ============================================================
+           RESPONSIVE DESIGN
+           ============================================================ */
+        @media (max-width: 992px) {
+            .page-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 var(--space-md);
+            }
+
+            .navbar-links {
+                display: none;
+            }
+
+            .main-content {
+                padding: var(--space-md);
+            }
+
+            .page-header {
+                margin: calc(-1 * var(--space-md));
+                margin-bottom: var(--space-md);
+                padding: var(--space-lg) var(--space-md);
+            }
+
+            .page-header-inner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .page-title {
+                font-size: var(--font-size-xl);
+                justify-content: center;
+            }
+
+            .clear-history-btn {
+                align-self: center;
+            }
+
+            .tab-label {
+                padding: var(--space-sm) var(--space-md);
+                font-size: var(--font-size-sm);
+            }
+
+            .activity-card-inner {
+                flex-wrap: wrap;
+            }
+
+            .activity-amount {
+                width: 100%;
+                text-align: left;
+                margin-top: var(--space-sm);
+                padding-top: var(--space-sm);
+                border-top: 1px solid var(--gray-100);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .delete-wrapper {
+                position: static;
+                margin-top: var(--space-sm);
+            }
+        }
+
+        /* ============================================================
+           ACCESSIBILITY - Focus States
+           ============================================================ */
+        a:focus-visible,
+        button:focus-visible,
+        .tab-label:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* High contrast for danger actions */
+        .btn-danger:focus-visible,
+        .confirm-yes:focus-visible {
+            outline-color: var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Use shared header for consistency -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- ============================================================
+         CLEAR HISTORY CONFIRMATION MODAL
+         Using :target for pure CSS activation
+         ============================================================ -->
+    <div id="clear-history-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <h2 id="modal-title" class="modal-title">Clear Entire History?</h2>
+            <p class="modal-message">
+                This will <strong>permanently delete</strong> all expense and settlement history for this group.
+                This action cannot be undone.
+            </p>
+            <div class="modal-actions">
+                <a href="#" class="modal-btn modal-btn-cancel">Cancel</a>
+                <form th:action="@{/expenses/history/{groupId}/clear(groupId=${group.id})}" method="post"
+                    style="display: inline;">
+                    <button type="submit" class="modal-btn modal-btn-danger">🗑️ Delete All</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MAIN CONTENT
+         ============================================================ -->
+    <main class="main-content" role="main">
+        <!-- Page Header with Clear History Button -->
+        <header class="page-header">
+            <div class="page-header-inner">
+                <div class="page-header-content">
+                    <nav class="breadcrumb" aria-label="Breadcrumb">
+                        <a href="/" class="breadcrumb-item">Home</a>
+                        <span class="breadcrumb-separator" aria-hidden="true">›</span>
+                        <a th:href="@{/groups/{id}(id=${group.id})}" class="breadcrumb-item"
+                            th:text="${group.name}">Group</a>
+                        <span class="breadcrumb-separator" aria-hidden="true">›</span>
+                        <span class="breadcrumb-item" aria-current="page">History</span>
+                    </nav>
+                    <h1 class="page-title">📜 Expense History</h1>
+                    <p class="page-subtitle">View, manage, and clear your expense and settlement history</p>
+                </div>
+
+                <!-- Clear Entire History Button -->
+                <a href="#clear-history-modal" class="clear-history-btn" aria-describedby="clear-tooltip">
+                    🗑️ Clear Entire History
+                </a>
+            </div>
+        </header>
+
+        <!-- Page Grid Layout -->
+        <div class="page-grid">
+            <!-- Left Column: History Content -->
+            <section class="history-content" aria-label="History timeline">
+                <!-- CSS-Only Tabs -->
+                <div class="tabs-container">
+                    <!-- Hidden Radio Inputs for Tab State -->
+                    <input type="radio" name="history-tabs" id="tab-all" class="tab-input" checked>
+                    <input type="radio" name="history-tabs" id="tab-expenses" class="tab-input">
+                    <input type="radio" name="history-tabs" id="tab-settlements" class="tab-input">
+
+                    <!-- Tab Headers -->
+                    <div class="tabs-header" role="tablist">
+                        <label for="tab-all" class="tab-label" role="tab">📋 All</label>
+                        <label for="tab-expenses" class="tab-label" role="tab">🧾 Expenses</label>
+                        <label for="tab-settlements" class="tab-label" role="tab">✅ Settlements</label>
+                    </div>
+
+                    <!-- ==================== TAB CONTENT: ALL ==================== -->
+                    <div class="tab-content content-all" role="tabpanel">
+                        <!-- Empty State -->
+                        <div th:if="${#lists.isEmpty(activities)}" class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3 class="empty-state-title">No History Available</h3>
+                            <p class="empty-state-text">
+                                Start by adding an expense to this group. All your transactions will appear here.
+                            </p>
+                            <a th:href="@{/expenses/add(groupId=${group.id})}" class="btn btn-primary">
+                                ➕ Add First Expense
+                            </a>
+                        </div>
+
+                        <!-- Activity List -->
+                        <div th:unless="${#lists.isEmpty(activities)}" class="activity-list">
+                            <th:block th:each="activity : ${activities}">
+
+                                <!-- ===== EXPENSE CARD ===== -->
+                                <article th:if="${activity.expense}" class="activity-card expense">
+                                    <!-- Delete Button with Confirmation -->
+                                    <div class="delete-wrapper" tabindex="0">
+                                        <button class="delete-btn" aria-label="Delete expense">🗑️</button>
+                                        <div class="delete-confirm" role="dialog">
+                                            <div class="delete-confirm-text">Are you sure?</div>
+                                            <div class="delete-confirm-actions">
+                                                <form th:action="@{/expenses/{id}/delete(id=${activity.id})}"
+                                                    method="post">
+                                                    <input type="hidden" name="groupId" th:value="${group.id}">
+                                                    <button type="submit" class="confirm-btn confirm-yes">✓ Yes</button>
+                                                </form>
+                                                <button type="button" class="confirm-btn confirm-no">✕ No</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-card-inner">
+                                        <div class="activity-icon expense" aria-hidden="true">🧾</div>
+                                        <div class="activity-content">
+                                            <h3 class="activity-title" th:text="${activity.description}">Dinner at
+                                                Restaurant</h3>
+                                            <div class="activity-meta">
+                                                <span class="badge badge-split" th:if="${activity.splitType != null}">
+                                                    ⚡ <span th:text="${activity.splitType}">EQUAL</span>
+                                                </span>
+                                                <span class="badge badge-you-owe">You Owe</span>
+                                            </div>
+                                            <p class="activity-details">
+                                                👤 Paid by <strong th:text="${activity.paidBy.name}">User</strong>
+                                                &nbsp;•&nbsp;
+                                                👥 <span th:text="${group.name}">Group</span>
+                                            </p>
+                                        </div>
+                                        <div class="activity-amount">
+                                            <div class="amount-value negative">
+                                                ₹<span
+                                                    th:text="${#numbers.formatDecimal(activity.amount, 1, 2)}">500.00</span>
+                                            </div>
+                                            <div class="amount-date" th:if="${activity.createdAt != null}"
+                                                th:text="${#temporals.format(activity.createdAt, 'dd MMM yyyy')}">15 Dec
+                                                2024</div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <!-- ===== SETTLEMENT CARD ===== -->
+                                <article th:if="${activity.settlement}" class="activity-card settlement">
+                                    <!-- Delete Button with Confirmation -->
+                                    <div class="delete-wrapper" tabindex="0">
+                                        <button class="delete-btn" aria-label="Delete settlement">🗑️</button>
+                                        <div class="delete-confirm" role="dialog">
+                                            <div class="delete-confirm-text">Are you sure?</div>
+                                            <div class="delete-confirm-actions">
+                                                <form
+                                                    th:action="@{/expenses/settlements/{id}/delete(id=${activity.id})}"
+                                                    method="post">
+                                                    <input type="hidden" name="groupId" th:value="${group.id}">
+                                                    <button type="submit" class="confirm-btn confirm-yes">✓ Yes</button>
+                                                </form>
+                                                <button type="button" class="confirm-btn confirm-no">✕ No</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-card-inner">
+                                        <div class="activity-icon settlement" aria-hidden="true">✅</div>
+                                        <div class="activity-content">
+                                            <h3 class="activity-title">
+                                                <span style="color: var(--success);">✓</span> Payment Recorded
+                                            </h3>
+                                            <div class="activity-meta">
+                                                <span class="badge badge-settled">Settled</span>
+                                            </div>
+                                            <div class="settlement-flow">
+                                                <strong th:text="${activity.paidBy.name}">Payer</strong>
+                                                <span class="settlement-arrow">→</span>
+                                                <strong th:text="${activity.paidTo.name}">Receiver</strong>
+                                            </div>
+                                        </div>
+                                        <div class="activity-amount">
+                                            <div class="amount-value positive">
+                                                +₹<span
+                                                    th:text="${#numbers.formatDecimal(activity.amount, 1, 2)}">500.00</span>
+                                            </div>
+                                            <div class="amount-date" th:if="${activity.createdAt != null}"
+                                                th:text="${#temporals.format(activity.createdAt, 'dd MMM yyyy')}">15 Dec
+                                                2024</div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </th:block>
+                        </div>
+                    </div>
+
+                    <!-- ==================== TAB CONTENT: EXPENSES ONLY ==================== -->
+                    <div class="tab-content content-expenses" role="tabpanel">
+                        <div th:if="${#lists.isEmpty(activities.?[expense])}" class="empty-state">
+                            <div class="empty-state-icon">🧾</div>
+                            <h3 class="empty-state-title">No Expenses Yet</h3>
+                            <p class="empty-state-text">No expenses have been added to this group.</p>
+                        </div>
+                        <div class="activity-list">
+                            <th:block th:each="activity : ${activities}">
+                                <article th:if="${activity.expense}" class="activity-card expense">
+                                    <div class="delete-wrapper" tabindex="0">
+                                        <button class="delete-btn" aria-label="Delete">🗑️</button>
+                                        <div class="delete-confirm">
+                                            <div class="delete-confirm-text">Delete this expense?</div>
+                                            <div class="delete-confirm-actions">
+                                                <form th:action="@{/expenses/{id}/delete(id=${activity.id})}"
+                                                    method="post">
+                                                    <input type="hidden" name="groupId" th:value="${group.id}">
+                                                    <button type="submit" class="confirm-btn confirm-yes">✓ Yes</button>
+                                                </form>
+                                                <button type="button" class="confirm-btn confirm-no">✕ No</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="activity-card-inner">
+                                        <div class="activity-icon expense">🧾</div>
+                                        <div class="activity-content">
+                                            <h3 class="activity-title" th:text="${activity.description}">Expense</h3>
+                                            <div class="activity-meta">
+                                                <span class="badge badge-split" th:if="${activity.splitType != null}">
+                                                    ⚡ <span th:text="${activity.splitType}">EQUAL</span>
+                                                </span>
+                                            </div>
+                                            <p class="activity-details">
+                                                👤 Paid by <strong th:text="${activity.paidBy.name}">User</strong>
+                                            </p>
+                                        </div>
+                                        <div class="activity-amount">
+                                            <div class="amount-value negative">
+                                                ₹<span
+                                                    th:text="${#numbers.formatDecimal(activity.amount, 1, 2)}">0.00</span>
+                                            </div>
+                                            <div class="amount-date" th:if="${activity.createdAt != null}"
+                                                th:text="${#temporals.format(activity.createdAt, 'dd MMM')}">Date</div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </th:block>
+                        </div>
+                    </div>
+
+                    <!-- ==================== TAB CONTENT: SETTLEMENTS ONLY ==================== -->
+                    <div class="tab-content content-settlements" role="tabpanel">
+                        <div th:if="${#lists.isEmpty(activities.?[settlement])}" class="empty-state">
+                            <div class="empty-state-icon">✅</div>
+                            <h3 class="empty-state-title">No Settlements Yet</h3>
+                            <p class="empty-state-text">No payments have been recorded.</p>
+                        </div>
+                        <div class="activity-list">
+                            <th:block th:each="activity : ${activities}">
+                                <article th:if="${activity.settlement}" class="activity-card settlement">
+                                    <div class="delete-wrapper" tabindex="0">
+                                        <button class="delete-btn" aria-label="Delete">🗑️</button>
+                                        <div class="delete-confirm">
+                                            <div class="delete-confirm-text">Delete this settlement?</div>
+                                            <div class="delete-confirm-actions">
+                                                <form
+                                                    th:action="@{/expenses/settlements/{id}/delete(id=${activity.id})}"
+                                                    method="post">
+                                                    <input type="hidden" name="groupId" th:value="${group.id}">
+                                                    <button type="submit" class="confirm-btn confirm-yes">✓ Yes</button>
+                                                </form>
+                                                <button type="button" class="confirm-btn confirm-no">✕ No</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="activity-card-inner">
+                                        <div class="activity-icon settlement">✅</div>
+                                        <div class="activity-content">
+                                            <h3 class="activity-title">
+                                                <span style="color: var(--success);">✓</span> Payment
+                                            </h3>
+                                            <div class="settlement-flow">
+                                                <strong th:text="${activity.paidBy.name}">Payer</strong>
+                                                <span class="settlement-arrow">→</span>
+                                                <strong th:text="${activity.paidTo.name}">Receiver</strong>
+                                            </div>
+                                        </div>
+                                        <div class="activity-amount">
+                                            <div class="amount-value positive">
+                                                +₹<span
+                                                    th:text="${#numbers.formatDecimal(activity.amount, 1, 2)}">0.00</span>
+                                            </div>
+                                            <div class="amount-date" th:if="${activity.createdAt != null}"
+                                                th:text="${#temporals.format(activity.createdAt, 'dd MMM')}">Date</div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 SIDEBAR
+                 ============================================================ -->
+            <aside class="sidebar" aria-label="Summary and actions">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon expense" aria-hidden="true">🧾</div>
+                        <div class="stat-value" th:text="${#lists.size(activities.?[expense])}">0</div>
+                        <div class="stat-label">Expenses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon settlement" aria-hidden="true">✅</div>
+                        <div class="stat-value" th:text="${#lists.size(activities.?[settlement])}">0</div>
+                        <div class="stat-label">Settlements</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="action-card">
+                    <h3 class="action-card-title">⚡ Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a th:href="@{/expenses/add(groupId=${group.id})}" class="btn btn-success">➕ Add Expense</a>
+                        <a th:href="@{/expenses/settle/{groupId}(groupId=${group.id})}" class="btn btn-primary">💰
+                            Settle Dues</a>
+                        <a th:href="@{/expenses/balances/{groupId}(groupId=${group.id})}" class="btn btn-outline">📊
+                            View
+                            Balances</a>
+                        <a th:href="@{/groups/{groupId}(groupId=${group.id})}" class="btn btn-outline">← Back to
+                            Group</a>
+                    </div>
+                </div>
+
+                <!-- Info Card -->
+                <div class="info-card">
+                    <h4 class="info-card-title">ℹ️ About History</h4>
+                    <p class="info-card-text">
+                        View all expenses and settlements. Use the tabs to filter.
+                        <br><br>
+                        <strong>⚠️ Deleting records</strong> will affect balance calculations.
+                        Proceed with caution.
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </main>
+</body>
+
+</html>

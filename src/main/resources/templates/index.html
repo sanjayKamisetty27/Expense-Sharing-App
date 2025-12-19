@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/common :: head('Expense Sharing App')}"></head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-5">
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="url(#gradient)"
+                    class="bi bi-wallet2" viewBox="0 0 16 16">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea" />
+                            <stop offset="100%" style="stop-color:#764ba2" />
+                        </linearGradient>
+                    </defs>
+                    <path
+                        d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z" />
+                </svg>
+            </div>
+            <h1 class="display-4 fw-bold text-dark">Welcome to ExpenseShare</h1>
+            <p class="lead text-muted mb-4">Easily manage shared expenses with your friends and family.</p>
+            <hr class="my-4 w-25 mx-auto">
+            <p class="text-secondary">Get started by managing users or groups.</p>
+
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-4">
+                <a class="btn btn-primary btn-lg px-4 shadow-sm" href="/users">
+                    <i class="bi bi-people me-2"></i>Manage Users
+                </a>
+                <a class="btn btn-outline-secondary btn-lg px-4" href="/groups">
+                    <i class="bi bi-collection me-2"></i>Manage Groups
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-5 g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center py-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-person-plus display-4 text-primary"></i>
+                        </div>
+                        <h5 class="card-title">Add Users</h5>
+                        <p class="card-text text-muted">Create and manage users who share expenses.</p>
+                        <a href="/users/new" class="btn btn-outline-primary">Create User</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center py-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-receipt display-4 text-success"></i>
+                        </div>
+                        <h5 class="card-title">Add Expenses</h5>
+                        <p class="card-text text-muted">Record expenses and split them fairly.</p>
+                        <a href="/expenses/add" class="btn btn-outline-success">Add Expense</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center py-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-cash-stack display-4 text-warning"></i>
+                        </div>
+                        <h5 class="card-title">View Balances</h5>
+                        <p class="card-text text-muted">See who owes whom and settle up.</p>
+                        <a href="/groups" class="btn btn-outline-warning">View Balances</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+
+</html>

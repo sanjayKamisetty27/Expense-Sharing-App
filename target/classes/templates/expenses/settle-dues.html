@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/common :: head('Settle Dues')}"></head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-check2-circle me-2"></i>Settle Dues for <span th:text="${group.name}">Group</span></h2>
+            <a th:href="@{/expenses/balances/{id}(id=${group.id})}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Balances
+            </a>
+        </div>
+
+        <div class="row">
+            <!-- Settlement Form -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-cash me-2"></i>Record a Settlement</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/expenses/settle}" method="post">
+                            <input type="hidden" name="groupId" th:value="${group.id}">
+
+                            <!-- Who is paying (debtor) -->
+                            <div class="mb-3">
+                                <label for="paidByUserId" class="form-label fw-bold">
+                                    <i class="bi bi-person-fill me-1 text-danger"></i>Who is Paying?
+                                </label>
+                                <select name="paidByUserId" id="paidByUserId" class="form-select" required>
+                                    <option value="">Select the person paying...</option>
+                                    <th:block th:each="user : ${group.users}">
+                                        <option th:value="${user.id}" th:text="${user.name}"
+                                            th:selected="${user.id == preselectedFromUserId}">
+                                        </option>
+                                    </th:block>
+                                </select>
+                                <div class="form-text">The person who owes money and is making the payment</div>
+                            </div>
+
+                            <!-- Who is receiving (creditor) -->
+                            <div class="mb-3">
+                                <label for="paidToUserId" class="form-label fw-bold">
+                                    <i class="bi bi-person-fill me-1 text-success"></i>Who is Receiving?
+                                </label>
+                                <select name="paidToUserId" id="paidToUserId" class="form-select" required>
+                                    <option value="">Select the person receiving...</option>
+                                    <th:block th:each="user : ${group.users}">
+                                        <option th:value="${user.id}" th:text="${user.name}"
+                                            th:selected="${user.id == preselectedToUserId}">
+                                        </option>
+                                    </th:block>
+                                </select>
+                                <div class="form-text">The person who is owed money and is receiving the payment</div>
+                            </div>
+
+                            <!-- Amount -->
+                            <div class="mb-4">
+                                <label for="amount" class="form-label fw-bold">
+                                    <i class="bi bi-currency-rupee me-1"></i>Amount
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="number" step="0.01" min="0.01" name="amount" id="amount"
+                                        class="form-control form-control-lg" th:value="${preselectedAmount}"
+                                        placeholder="0.00" required>
+                                </div>
+                                <div class="form-text">The amount being settled</div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle me-2"></i>Record Settlement
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Balances -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Outstanding Balances</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- No Balances -->
+                        <div th:if="${balances.empty}" class="text-center py-4">
+                            <i class="bi bi-check-circle display-3 text-success mb-3"></i>
+                            <h5 class="text-success">All Settled Up!</h5>
+                            <p class="text-muted">No outstanding balances in this group.</p>
+                        </div>
+
+                        <!-- Balances List -->
+                        <div th:unless="${balances.empty}" class="list-group list-group-flush">
+                            <th:block th:each="entry : ${balances}">
+                                <th:block th:each="debt : ${entry.value}">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong th:text="${entry.key.name}">Debtor</strong>
+                                            <span class="text-muted mx-1">→</span>
+                                            <strong th:text="${debt.key.name}">Creditor</strong>
+                                        </div>
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">
+                                            ₹<span th:text="${debt.value}">0.00</span>
+                                        </span>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Card -->
+                <div class="card shadow-sm mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="bi bi-info-circle me-2 text-info"></i>How it works</h6>
+                        <ul class="mb-0 small text-muted">
+                            <li>Select the person who is <strong>making the payment</strong> (the debtor)</li>
+                            <li>Select the person <strong>receiving the payment</strong> (the creditor)</li>
+                            <li>Enter the amount being paid</li>
+                            <li>The balance will be reduced by this amount</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+
+</html>

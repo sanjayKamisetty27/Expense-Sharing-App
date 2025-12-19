@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="470d2a8b-0855-46cc-a3a5-eaa38e5f107c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/implementation_plan.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/ExpenseSharingApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/controller/ExpenseController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/controller/GroupController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/controller/HomeController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/controller/UserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/model/ActivityItem.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/model/Expense.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/model/ExpenseShare.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/model/Group.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/model/Settlement.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/model/SplitType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/model/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/repository/ExpenseRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/repository/ExpenseShareRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/repository/GroupRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/repository/SettlementRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/repository/UserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/service/ActivityService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/service/BalanceService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/service/ExpenseService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/service/GroupService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/service/SettlementService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/expensesharing/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/balances/view-balances.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/expenses/add-expense.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/expenses/history.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/expenses/settle-dues.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/fragments/common.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/fragments/header.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/groups/create-group.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/groups/edit-group.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/groups/group-details.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/groups/list-groups.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/users/create-user.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/users/edit-user.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/users/list-users.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/users/view-user.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/ExpenseSharingApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/controller/ExpenseController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/controller/GroupController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/controller/HomeController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/controller/UserController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/model/ActivityItem$ActivityType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/model/ActivityItem.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/model/Expense.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/model/ExpenseShare.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/model/Group.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/model/Settlement.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/model/SplitType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/model/User.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/repository/ExpenseRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/repository/ExpenseShareRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/repository/GroupRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/repository/SettlementRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/repository/UserRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/service/ActivityService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/service/BalanceService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/service/ExpenseService$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/service/ExpenseService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/service/GroupService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/service/SettlementService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/expensesharing/service/UserService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/balances/view-balances.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/expenses/add-expense.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/expenses/history.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/expenses/settle-dues.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/fragments/common.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/fragments/header.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/groups/create-group.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/groups/edit-group.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/groups/group-details.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/groups/list-groups.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/users/create-user.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/users/edit-user.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/users/list-users.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/templates/users/view-user.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/task.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/walkthrough.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="370WtK7SaWaEMKq55UXMSE1afRc" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.ExpenseSharingApplication.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Sanjay project",
+    "settings.editor.selected.configurable": "vcs.Git"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Sanjay project" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Sanjay project" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="470d2a8b-0855-46cc-a3a5-eaa38e5f107c" name="Changes" comment="" />
+      <created>1766040681891</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1766040681891</updated>
+    </task>
+    <servers />
+  </component>
+</project>

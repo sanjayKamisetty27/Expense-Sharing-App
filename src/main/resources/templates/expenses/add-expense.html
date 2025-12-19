@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/common :: head('Add Expense')}"></head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Add New Expense</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/expenses/add" method="post" id="expenseForm" onsubmit="return validateForm()">
+                            <input type="hidden" name="groupId" th:value="${selectedGroup.id}">
+
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-card-text me-1"></i> Description</label>
+                                <input type="text" name="description" class="form-control"
+                                    placeholder="What was this expense for?" required>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="bi bi-currency-rupee me-1"></i> Amount</label>
+                                    <input type="number" step="0.01" name="amount" id="totalAmount" class="form-control"
+                                        placeholder="0.00" required oninput="validateSplits()">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="bi bi-person me-1"></i> Paid By</label>
+                                    <select name="paidByUserId" class="form-select">
+                                        <option th:each="user : ${selectedGroup.users}" th:value="${user.id}"
+                                            th:text="${user.name}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-diagram-3 me-1"></i> Split Type</label>
+                                <select name="splitType" id="splitType" class="form-select" onchange="toggleSplits()">
+                                    <option th:each="type : ${splitTypes}" th:value="${type}" th:text="${type}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div id="splitInputs" style="display:none;" class="mb-3">
+                                <div class="card bg-light p-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0"><i class="bi bi-sliders me-1"></i> Split Details</h6>
+                                        <span id="splitSummary" class="badge bg-secondary">Total: ₹0</span>
+                                    </div>
+                                    <p class="text-muted small" id="splitHint">Enter the amount for each person.</p>
+                                    <div th:each="user : ${selectedGroup.users}" class="mb-2 row align-items-center">
+                                        <label class="col-sm-4 col-form-label" th:text="${user.name}">User</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" step="0.01" th:name="'split_' + ${user.id}"
+                                                class="form-control split-input" placeholder="Value"
+                                                oninput="validateSplits()">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Validation Warning -->
+                                <div id="validationWarning" class="alert alert-warning mt-3" style="display:none;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+                                        <div>
+                                            <strong>Split Mismatch!</strong>
+                                            <p class="mb-0 small" id="warningMessage">The split amounts don't add up
+                                                correctly.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Success Indicator -->
+                                <div id="validationSuccess" class="alert alert-success mt-3" style="display:none;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+                                        <div>
+                                            <strong>Perfect!</strong>
+                                            <p class="mb-0 small">Split amounts are correct.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/groups/{id}(id=${selectedGroup.id})}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success" id="submitBtn">
+                                    <i class="bi bi-check-lg me-1"></i> Add Expense
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/common :: scripts}"></div>
+
+    <script>
+        function toggleSplits() {
+            var splitType = document.getElementById("splitType").value;
+            var splitInputsDiv = document.getElementById("splitInputs");
+            var splitHint = document.getElementById("splitHint");
+            var splitInputFields = document.querySelectorAll(".split-input");
+
+            // Clear all split input values when changing type
+            splitInputFields.forEach(function (input) {
+                input.value = '';
+            });
+
+            // Hide validation alerts
+            document.getElementById("validationWarning").style.display = 'none';
+            document.getElementById("validationSuccess").style.display = 'none';
+            document.getElementById("splitSummary").className = 'badge bg-secondary';
+            document.getElementById("submitBtn").disabled = false;
+
+            if (splitType === 'EQUAL') {
+                splitInputsDiv.style.display = 'none';
+            } else {
+                splitInputsDiv.style.display = 'block';
+                if (splitType === 'EXACT') {
+                    splitHint.textContent = 'Enter the exact amount for each person. Total must equal the expense amount.';
+                    document.getElementById("splitSummary").textContent = 'Total: ₹0';
+                } else if (splitType === 'PERCENTAGE') {
+                    splitHint.textContent = 'Enter the percentage for each person. Total must equal 100%.';
+                    document.getElementById("splitSummary").textContent = 'Total: 0% / 100%';
+                }
+            }
+        }
+
+        function validateSplits() {
+            var splitType = document.getElementById("splitType").value;
+            var totalAmount = parseFloat(document.getElementById("totalAmount").value) || 0;
+            var splitInputs = document.querySelectorAll(".split-input");
+            var warningDiv = document.getElementById("validationWarning");
+            var successDiv = document.getElementById("validationSuccess");
+            var warningMsg = document.getElementById("warningMessage");
+            var summaryBadge = document.getElementById("splitSummary");
+            var submitBtn = document.getElementById("submitBtn");
+
+            if (splitType === 'EQUAL') {
+                warningDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            var sum = 0;
+            var hasValues = false;
+            splitInputs.forEach(function (input) {
+                var val = parseFloat(input.value) || 0;
+                if (val > 0) hasValues = true;
+                sum += val;
+            });
+
+            // Update summary badge
+            if (splitType === 'EXACT') {
+                summaryBadge.textContent = 'Total: ₹' + sum.toFixed(2) + ' / ₹' + totalAmount.toFixed(2);
+            } else {
+                summaryBadge.textContent = 'Total: ' + sum.toFixed(1) + '% / 100%';
+            }
+
+            if (!hasValues) {
+                warningDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+                summaryBadge.className = 'badge bg-secondary';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            var isValid = false;
+
+            if (splitType === 'EXACT') {
+                var diff = Math.abs(sum - totalAmount);
+                if (diff < 0.02) { // Allow small rounding errors
+                    isValid = true;
+                } else if (sum < totalAmount) {
+                    warningMsg.textContent = 'Split total (₹' + sum.toFixed(2) + ') is less than expense amount (₹' + totalAmount.toFixed(2) + '). Missing: ₹' + (totalAmount - sum).toFixed(2);
+                } else {
+                    warningMsg.textContent = 'Split total (₹' + sum.toFixed(2) + ') exceeds expense amount (₹' + totalAmount.toFixed(2) + '). Excess: ₹' + (sum - totalAmount).toFixed(2);
+                }
+            } else if (splitType === 'PERCENTAGE') {
+                var diff = Math.abs(sum - 100);
+                if (diff < 0.5) { // Allow small rounding errors
+                    isValid = true;
+                } else if (sum < 100) {
+                    warningMsg.textContent = 'Total percentage (' + sum.toFixed(1) + '%) is less than 100%. Missing: ' + (100 - sum).toFixed(1) + '%';
+                } else {
+                    warningMsg.textContent = 'Total percentage (' + sum.toFixed(1) + '%) exceeds 100%. Excess: ' + (sum - 100).toFixed(1) + '%';
+                }
+            }
+
+            if (isValid) {
+                warningDiv.style.display = 'none';
+                successDiv.style.display = 'block';
+                summaryBadge.className = 'badge bg-success';
+                submitBtn.disabled = false;
+            } else {
+                warningDiv.style.display = 'block';
+                successDiv.style.display = 'none';
+                summaryBadge.className = 'badge bg-danger';
+                submitBtn.disabled = true;
+            }
+        }
+
+        function validateForm() {
+            var splitType = document.getElementById("splitType").value;
+
+            if (splitType === 'EQUAL') {
+                return true;
+            }
+
+            var totalAmount = parseFloat(document.getElementById("totalAmount").value) || 0;
+            var splitInputs = document.querySelectorAll(".split-input");
+            var sum = 0;
+
+            splitInputs.forEach(function (input) {
+                sum += parseFloat(input.value) || 0;
+            });
+
+            if (splitType === 'EXACT') {
+                if (Math.abs(sum - totalAmount) > 0.02) {
+                    alert('Split amounts must equal the total expense amount!');
+                    return false;
+                }
+            } else if (splitType === 'PERCENTAGE') {
+                if (Math.abs(sum - 100) > 0.5) {
+                    alert('Percentages must add up to 100%!');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    </script>
+</body>
+
+</html>

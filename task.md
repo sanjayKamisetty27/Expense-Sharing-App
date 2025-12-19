@@ -1,0 +1,42 @@
+# Expense Sharing Application Tasks
+
+- [x] Initialize Project Structure
+    - [x] Create Maven project structure
+    - [x] Add dependencies (Spring Web, JPA, MySQL, Thymeleaf, Lombok)
+- [x] Backend Implementation
+    - [x] Create Entities (User, Group, Expense, ExpenseShare)
+    - [x] Create Repositories
+    - [x] Create Services (User, Group, Expense logic)
+    - [x] Implement Split Strategies (Equal, Exact, Percentage)
+    - [x] Implement Balance Calculation & Simplification
+    - [x] Create Controllers
+- [x] Testing Phase
+    - [x] Create Test Strategy Document (test_strategy.md)
+    - [x] Implement Unit Tests (UserServiceTest, GroupServiceTest, ExpenseServiceTest, BalanceServiceTest)
+    - [x] Implement Integration Tests (UserControllerIntegrationTest, GroupControllerIntegrationTest, ExpenseControllerIntegrationTest)
+    - [x] Verify SQL Queries
+- [x] Frontend / UI Testing
+    - [x] Create UI Test Scenarios (in TESTING.md)
+    - [x] Add Selenium Dependencies to pom.xml
+    - [x] Implement UI Automation Tests (Selenium)
+        - [x] Page Object Model (BasePage, HomePage, UserListPage, CreateUserPage, GroupListPage, CreateGroupPage, GroupDetailsPage, AddExpensePage, BalancesPage)
+        - [x] Home & User Pages
+        - [x] Group & Expense Pages
+        - [x] Balance Pages
+- [x] Frontend Refactoring (New Structure)
+    - [x] Create Directory Structure (users, groups, expenses, fragments)
+    - [x] Create Fragments (Header/Footer/Common)
+    - [x] Move and Rename Templates
+    - [x] Update Controllers to return new paths
+    - [x] Update Index Dashboard
+    - [x] Modern Navbar with Dropdowns & Icons
+- [x] Frontend Implementation
+    - [x] Create Thymeleaf templates (index, users, groups, expenses)
+    - [x] Add basic CSS
+- [x] Configuration
+    - [x] Configure `application.properties` for MySQL
+- [x] Documentation
+    - [x] Create README.md
+    - [x] Create comprehensive TESTING.md
+    - [x] Create Postman Collection
+    - [x] Create test-data-setup.sql
