@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface SettlementRepository extends JpaRepository<Settlement, Long> {
     List<Settlement> findByGroupId(Long groupId);
+    
+    void deleteByGroupId(Long groupId);
 }

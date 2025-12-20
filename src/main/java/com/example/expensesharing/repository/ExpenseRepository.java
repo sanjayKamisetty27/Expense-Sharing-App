@@ -6,4 +6,8 @@ import java.util.List;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByGroupId(Long groupId);
+    
+    long countByGroupId(Long groupId);
+    
+    void deleteByGroupId(Long groupId);
 }
